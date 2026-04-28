@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, User, MapPin, Building2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Building2, ShieldCheck, ArrowRight, Monitor } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const Signup = () => {
+const TheatreAuth = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     theatre_name: '',
     theatre_address: '',
+    total_screens: 1,
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { registerTheatreUser } = useAuth(); 
+  const { login, loginTheatreUser, registerTheatreUser } = useAuth(); // Assume we will add these to context
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -25,11 +27,17 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      await registerTheatreUser(formData);
-      toast.success('Account created successfully! Please log in.');
-      navigate('/login');
+      if (isLogin) {
+        await loginTheatreUser({ username: formData.username, password: formData.password });
+        toast.success('Logged in successfully!');
+        navigate('/dashboard');
+      } else {
+        await registerTheatreUser(formData);
+        toast.success('Registration successful! Please log in.');
+        setIsLogin(true);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed');
+      toast.error(error.response?.data?.message || 'Authentication failed');
     } finally {
       setIsLoading(false);
     }
@@ -40,8 +48,8 @@ const Signup = () => {
       <div className="auth-card">
         <div className="auth-header">
           <ShieldCheck size={48} className="auth-icon" />
-          <h1>Create Account</h1>
-          <p>Register your theatre to get started</p>
+          <h1>Theatre Portal</h1>
+          <p>{isLogin ? 'Sign in to your theatre account' : 'Register your theatre'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -60,50 +68,69 @@ const Signup = () => {
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Email Address</label>
-            <div className="input-with-icon">
-              <Mail size={18} className="input-icon" />
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter email address"
-                required
-              />
-            </div>
-          </div>
+          {!isLogin && (
+            <>
+              <div className="form-group">
+                <label>Email Address</label>
+                <div className="input-with-icon">
+                  <Mail size={18} className="input-icon" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+              </div>
 
-          <div className="form-group">
-            <label>Theatre Name</label>
-            <div className="input-with-icon">
-              <Building2 size={18} className="input-icon" />
-              <input
-                type="text"
-                name="theatre_name"
-                value={formData.theatre_name}
-                onChange={handleChange}
-                placeholder="Enter theatre name"
-                required
-              />
-            </div>
-          </div>
+              <div className="form-group">
+                <label>Theatre Name</label>
+                <div className="input-with-icon">
+                  <Building2 size={18} className="input-icon" />
+                  <input
+                    type="text"
+                    name="theatre_name"
+                    value={formData.theatre_name}
+                    onChange={handleChange}
+                    placeholder="Enter theatre name"
+                    required
+                  />
+                </div>
+              </div>
 
-          <div className="form-group">
-            <label>Theatre Address</label>
-            <div className="input-with-icon">
-              <MapPin size={18} className="input-icon" />
-              <input
-                type="text"
-                name="theatre_address"
-                value={formData.theatre_address}
-                onChange={handleChange}
-                placeholder="Enter theatre full address"
-                required
-              />
-            </div>
-          </div>
+              <div className="form-group">
+                <label>Theatre Address</label>
+                <div className="input-with-icon">
+                  <MapPin size={18} className="input-icon" />
+                  <input
+                    type="text"
+                    name="theatre_address"
+                    value={formData.theatre_address}
+                    onChange={handleChange}
+                    placeholder="Enter theatre full address"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Number of Screens</label>
+                <div className="input-with-icon">
+                  <Monitor size={18} className="input-icon" />
+                  <input
+                    type="number"
+                    name="total_screens"
+                    value={formData.total_screens}
+                    onChange={handleChange}
+                    placeholder="e.g. 5"
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="form-group">
             <label>Password</label>
@@ -114,21 +141,28 @@ const Signup = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Create a strong password"
+                placeholder={isLogin ? "Enter your password" : "Create a strong password"}
                 required
               />
             </div>
           </div>
 
           <button type="submit" className="btn-primary auth-submit" disabled={isLoading}>
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+            {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Register Theatre')}
             {!isLoading && <ArrowRight size={18} />}
           </button>
         </form>
 
         <div className="auth-footer">
           <p>
-            Already have an account? <Link to="/login">Sign in here</Link>
+            {isLogin ? "Don't have an account?" : "Already registered?"}{' '}
+            <button 
+              type="button" 
+              className="toggle-auth-btn"
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? 'Register now' : 'Sign in instead'}
+            </button>
           </p>
         </div>
       </div>
@@ -240,14 +274,17 @@ const Signup = () => {
           color: var(--text-muted);
           font-size: 0.9rem;
         }
-        
-        .auth-footer a {
+
+        .toggle-auth-btn {
+          background: none;
+          border: none;
           color: var(--primary);
           font-weight: 600;
-          text-decoration: none;
+          cursor: pointer;
+          padding: 0;
         }
-        
-        .auth-footer a:hover {
+
+        .toggle-auth-btn:hover {
           text-decoration: underline;
         }
       `}</style>
@@ -255,4 +292,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default TheatreAuth;

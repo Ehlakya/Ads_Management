@@ -11,16 +11,48 @@ const Quotation = sequelize.define('Quotation', {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  theatre_user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   amount: {
     type: DataTypes.DECIMAL(12, 2),
-    allowNull: false,
+    allowNull: true,
   },
   status: {
     type: DataTypes.STRING,
     defaultValue: 'pending',
   },
+  admin_response: {
+    type: DataTypes.ENUM('accepted', 'rejected'),
+    allowNull: true,
+  },
+  admin_response_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   notes: {
     type: DataTypes.TEXT,
+  },
+  theatre_message: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  selected_screens: {
+    type: DataTypes.JSON, // Stores array of screen numbers [1, 2, 4]
+    allowNull: true,
+  },
+  admin_suggested_screen: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  theatre_screen_decision: {
+    type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+    defaultValue: 'pending',
+  },
+  confirmed_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
 }, {
   tableName: 'quotations',

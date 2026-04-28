@@ -41,7 +41,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="input-group">
-            <label>Username</label>
+            <label>Username or Email</label>
             <div className="input-wrapper">
               <User size={18} className="input-icon" />
               <input 
@@ -78,7 +78,7 @@ const Login = () => {
         </form>
 
         <div className="auth-footer">
-          Don't have an account? <Link to="/signup">Sign up for free</Link>
+          Don't have an account? <Link to="/signup">Create Account</Link>
         </div>
       </div>
 

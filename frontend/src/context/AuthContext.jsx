@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import authService from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -27,8 +28,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
   };
 
+  const loginTheatreUser = async (credentials) => {
+    const data = await authService.loginTheatre(credentials);
+    login(data);
+  };
+
+  const registerTheatreUser = async (userData) => {
+    const data = await authService.registerTheatre(userData);
+    // don't login automatically according to UI flow, just return data
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, loginTheatreUser, registerTheatreUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

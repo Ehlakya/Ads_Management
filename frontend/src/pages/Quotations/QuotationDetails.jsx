@@ -10,7 +10,8 @@ import {
   Briefcase,
   Shield,
   PlayCircle,
-  X
+  XCircle,
+  Monitor
 } from 'lucide-react';
 import quotationService from '../../services/quotationService';
 import { useAuth } from '../../context/AuthContext';
@@ -22,6 +23,7 @@ const QuotationDetails = () => {
   const { user } = useAuth();
   const [quotation, setQuotation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [videoModal, setVideoModal] = useState({ isOpen: false, url: '' });
 
   const renderVideoPlayer = (url) => {
@@ -55,11 +57,11 @@ const QuotationDetails = () => {
         if (found) {
           setQuotation(found);
         } else {
-          toast.error('Quotation not found');
+          toast.error('Ad information not found');
           navigate('/quotations');
         }
       } catch (error) {
-        toast.error('Failed to load quotation details');
+        toast.error('Failed to load details');
       } finally {
         setIsLoading(false);
       }
@@ -67,9 +69,12 @@ const QuotationDetails = () => {
     fetchQuotationDetails();
   }, [id, navigate]);
 
-  const handleOkClick = () => {
-    toast.success('Acknowledgement received');
-    navigate('/quotations');
+  const handleOkClick = async () => {
+    if (!quotation) {
+      toast.error('Details not loaded');
+      return;
+    }
+    navigate(`/quotations/${id}/request`);
   };
 
   if (isLoading) {
@@ -130,6 +135,19 @@ const QuotationDetails = () => {
                 <label>Client Reference</label>
                 <span>{quotation.ad_client}</span>
               </div>
+              {quotation.selected_screens && (
+                <div className="data-row">
+                  <label>Assigned Screens</label>
+                  <div className="screens-tags">
+                    {quotation.selected_screens.map(num => (
+                      <span key={num} className="screen-tag">
+                        <Monitor size={12} />
+                        Screen {num}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -166,13 +184,50 @@ const QuotationDetails = () => {
               </div>
             </div>
           </div>
+
+          {quotation.admin_response && (
+            <div className={`detail-group full-width admin-response ${quotation.admin_response}`}>
+              <div className="group-header">
+                {quotation.admin_response === 'accepted' ? (
+                  <>
+                    <CheckCircle size={18} className="response-icon" />
+                    <h3>Admin Response: Accepted</h3>
+                  </>
+                ) : (
+                  <>
+                    <XCircle size={18} className="response-icon" />
+                    <h3>Admin Response: Rejected</h3>
+                  </>
+                )}
+              </div>
+              <div className="group-content">
+                <div className="data-row">
+                  <label>Decision Made On</label>
+                  <span>{quotation.admin_response_at ? new Date(quotation.admin_response_at).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' }) : 'Recently'}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {user?.role === 'agent' && (
+        {user?.role === 'theatre_user' && quotation.status !== 'confirmed' && (
           <div className="card-actions">
-            <button onClick={handleOkClick} className="btn-primary ok-btn">
-              <CheckCircle size={18} />
-              <span>OK</span>
+            <button 
+              onClick={handleOkClick} 
+              className="btn-primary ok-btn"
+              disabled={isConfirming}
+            >
+              {isConfirming ? (
+                <>
+                  <div className="spinner-small" style={{ width: '16px', height: '16px' }}></div>
+                  <span>Confirming...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={18} />
+                  <span>OK</span>
+                </>
+              )}
             </button>
           </div>
         )}
@@ -300,12 +355,72 @@ const QuotationDetails = () => {
           color: var(--text);
         }
 
+        .screens-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 0.25rem;
+        }
+
+        .screen-tag {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          background: rgba(99, 102, 241, 0.1);
+          color: var(--primary);
+          padding: 0.25rem 0.6rem;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
         .amount-text { color: var(--success) !important; font-size: 1.25rem !important; }
 
         .notes-text {
           color: var(--text-muted);
           line-height: 1.6;
           font-style: italic;
+        }
+
+        .detail-group.admin-response {
+          padding: 1.5rem;
+          border-radius: 8px;
+        }
+
+        .detail-group.admin-response.accepted {
+          background: rgba(34, 197, 94, 0.05);
+          border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .detail-group.admin-response.rejected {
+          background: rgba(239, 68, 68, 0.05);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .detail-group.admin-response .group-header {
+          margin-bottom: 1rem;
+        }
+
+        .detail-group.admin-response.accepted .group-header {
+          color: var(--success);
+        }
+
+        .detail-group.admin-response.accepted .group-header h3 {
+          color: var(--success);
+        }
+
+        .detail-group.admin-response.rejected .group-header {
+          color: #ef4444;
+        }
+
+        .detail-group.admin-response.rejected .group-header h3 {
+          color: #ef4444;
+        }
+
+        .response-icon {
+          width: 20px;
+          height: 20px;
         }
 
         .card-actions {

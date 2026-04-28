@@ -11,18 +11,20 @@ import {
   Settings,
   ShieldCheck,
   ClipboardList,
-  MessageSquare
+  MessageSquare,
+  Building2
 } from 'lucide-react';
 
 const Sidebar = () => {
   const { user } = useAuth();
 
   const menuItems = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard', roles: ['superadmin', 'admin', 'agent'] },
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard', roles: ['superadmin', 'admin', 'agent', 'theatre_user'] },
     { name: 'Ads Management', icon: <Megaphone size={20} />, path: '/ads', roles: ['superadmin', 'admin'] },
-    { name: 'Quotations', icon: <FileText size={20} />, path: '/quotations', roles: ['superadmin', 'admin', 'agent'] },
-    { name: 'Agent Requests', icon: <ClipboardList size={20} />, path: '/sales/requests', roles: ['superadmin', 'admin'] },
-    { name: 'Admin Responses', icon: <MessageSquare size={20} />, path: '/sales/responses', roles: ['agent'] },
+    { name: 'Quotations', icon: <FileText size={20} />, path: '/quotations', roles: ['superadmin', 'admin', 'agent', 'theatre_user'] },
+    { name: 'Theatre Requests', icon: <Building2 size={20} />, path: '/theatre-requests', roles: ['superadmin', 'admin'] },
+    { name: 'Agent Responses', icon: <ClipboardList size={20} />, path: '/sales/requests', roles: ['superadmin', 'admin'] },
+    { name: 'Admin Responses', icon: <MessageSquare size={20} />, path: '/sales/responses', roles: ['agent', 'theatre_user'] },
     { name: 'Users', icon: <Users size={20} />, path: '/users', roles: ['superadmin', 'admin'] },
   ];
 

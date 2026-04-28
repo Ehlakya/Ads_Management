@@ -1,5 +1,5 @@
 const { sequelize } = require('./db');
-const { User, Ad, Quotation, Sale } = require('../models');
+const { User, Ad, Quotation, Sale, TheatreUser } = require('../models');
 const bcrypt = require('bcryptjs');
 
 const initDb = async () => {

@@ -88,3 +88,124 @@ exports.getUsers = async (req, res) => {
     res.status(res.statusCode || 500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Get theatre user requests
+// @route   GET /api/users/theatre-requests
+// @access  Private/SuperAdmin, Admin
+exports.getTheatreRequests = async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id, username, email, theatre_name, theatre_address, status, approved_at, rejection_reason, created_at 
+       FROM theatre_users ORDER BY status DESC, created_at DESC`
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result.rows,
+    });
+  } catch (error) {
+    res.status(res.statusCode || 500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get theatre user request by ID
+// @route   GET /api/users/theatre-requests/:id
+// @access  Private/Theatre User
+exports.getTheatreRequestStatus = async (req, res) => {
+  try {
+    const requestedId = Number(req.params.id);
+    const targetId = req.user.role === 'theatre_user' ? req.user.id : requestedId;
+
+    if (!targetId) {
+      res.status(400);
+      throw new Error('A valid theatre user ID is required');
+    }
+
+    if (
+      req.user.role === 'theatre_user' &&
+      requestedId &&
+      requestedId !== req.user.id
+    ) {
+      res.status(403);
+      throw new Error('Not authorized to view this theatre request');
+    }
+
+    const result = await query(
+      `SELECT id, username, email, theatre_name, theatre_address, status, approved_by, approved_at, rejection_reason, created_at 
+       FROM theatre_users WHERE id = $1`,
+      [targetId]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404);
+      throw new Error('Theatre user not found');
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    res.status(res.statusCode || 500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Approve a theatre user request
+// @route   POST /api/users/theatre-requests/:id/approve
+// @access  Private/SuperAdmin, Admin
+exports.approveTheatreRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const adminId = req.user.id;
+
+    const result = await query(
+      `UPDATE theatre_users
+       SET status = $1, approved_by = $2, approved_at = NOW(), rejection_reason = NULL
+       WHERE id = $3
+       RETURNING *`,
+      ['accepted', adminId, id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404);
+      throw new Error('Theatre user not found');
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Theatre user request approved successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    res.status(res.statusCode || 500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reject a theatre user request
+// @route   POST /api/users/theatre-requests/:id/reject
+// @access  Private/SuperAdmin, Admin
+exports.rejectTheatreRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const adminId = req.user.id;
+
+    const result = await query(
+      `UPDATE theatre_users SET status = $1, approved_by = $2, approved_at = NOW(), rejection_reason = $3 WHERE id = $4 RETURNING *`,
+      ['rejected', adminId, reason || 'No reason provided', id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404);
+      throw new Error('Theatre user not found');
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Theatre user request rejected successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    res.status(res.statusCode || 500).json({ success: false, message: error.message });
+  }
+};

@@ -44,7 +44,10 @@ const AdminDashboard = () => {
         <div className="banner-content">
           <h2>Welcome to the Admin Portal</h2>
           <p>You can now manage your agents, review their ad submissions, and track sales performance in real-time.</p>
-          <button onClick={() => navigate('/ads')} className="btn-primary">View All Ads</button>
+          <div className="banner-actions">
+            <button onClick={() => navigate('/ads')} className="btn-primary">View All Ads</button>
+            <button onClick={() => navigate('/theatre-requests')} className="btn-secondary">Manage Theatre Requests</button>
+          </div>
         </div>
       </div>
 
@@ -114,6 +117,17 @@ const AdminDashboard = () => {
           color: var(--text-muted);
           margin-bottom: 2rem;
           font-size: 1.125rem;
+        }
+
+        .banner-actions {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .banner-actions .btn-primary,
+        .banner-actions .btn-secondary {
+          margin: 0;
         }
       `}</style>
     </div>

@@ -9,10 +9,12 @@ import { useAuth } from './context/AuthContext';
 // Pages
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
+import TheatreAuth from './pages/Auth/TheatreAuth';
 import Unauthorized from './pages/Auth/Unauthorized';
 import SuperAdminDashboard from './pages/Dashboard/SuperAdminDashboard';
 import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import AgentDashboard from './pages/Dashboard/AgentDashboard';
+import TheatreDashboard from './pages/Dashboard/TheatreDashboard';
 import UserList from './pages/Users/UserList';
 import CreateAdmin from './pages/Users/CreateAdmin';
 import CreateAgent from './pages/Users/CreateAgent';
@@ -23,6 +25,8 @@ import AdDetails from './pages/Ads/AdDetails';
 import QuotationList from './pages/Quotations/QuotationList';
 import SendQuotation from './pages/Quotations/SendQuotation';
 import QuotationDetails from './pages/Quotations/QuotationDetails';
+import QuotationRequestForm from './pages/Quotations/QuotationRequestForm';
+import TheatreRequests from './pages/Quotations/TheatreRequests';
 import SalesList from './pages/Sales/SalesList';
 import AgentRequests from './pages/Sales/AgentRequests';
 import AdminResponse from './pages/Sales/AdminResponse';
@@ -43,6 +47,7 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/theatre-auth" element={<TheatreAuth />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           
           <Route path="/" element={
@@ -96,6 +101,16 @@ const App = () => {
             <Route path="quotations" element={<QuotationList />} />
             <Route path="quotations/send" element={<SendQuotation />} />
             <Route path="quotations/:id" element={<QuotationDetails />} />
+            <Route path="quotations/:id/request" element={
+              <ProtectedRoute allowedRoles={['theatre_user']}>
+                <QuotationRequestForm />
+              </ProtectedRoute>
+            } />
+            <Route path="theatre-requests" element={
+              <ProtectedRoute allowedRoles={['superadmin', 'admin']}>
+                <TheatreRequests />
+              </ProtectedRoute>
+            } />
             
             {/* Sales */}
             <Route path="sales" element={<SalesList />} />
@@ -105,7 +120,7 @@ const App = () => {
               </ProtectedRoute>
             } />
             <Route path="sales/responses" element={
-              <ProtectedRoute allowedRoles={['agent']}>
+              <ProtectedRoute allowedRoles={['agent', 'theatre_user']}>
                 <AdminResponse />
               </ProtectedRoute>
             } />
@@ -142,6 +157,7 @@ const DashboardRouter = () => {
   if (user?.role === 'superadmin') return <SuperAdminDashboard />;
   if (user?.role === 'admin') return <AdminDashboard />;
   if (user?.role === 'agent') return <AgentDashboard />;
+  if (user?.role === 'theatre_user') return <TheatreDashboard />;
   
   return <Navigate to="/login" replace />;
 };
