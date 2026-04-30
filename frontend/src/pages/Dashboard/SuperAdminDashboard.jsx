@@ -122,6 +122,8 @@ const SuperAdminDashboard = () => {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
+          gap: 1.5rem;
+          flex-wrap: wrap;
         }
 
         .subtitle {
@@ -129,6 +131,12 @@ const SuperAdminDashboard = () => {
           margin-top: 0.25rem;
           margin-bottom: 0;
           font-size: 1rem;
+        }
+
+        @media (max-width: 640px) {
+          .dashboard-header {
+            align-items: flex-start;
+          }
         }
 
         .stats-grid {
@@ -199,6 +207,12 @@ const SuperAdminDashboard = () => {
           display: grid;
           grid-template-columns: 2fr 1fr;
           gap: 1.5rem;
+        }
+
+        @media (max-width: 1200px) {
+          .charts-grid {
+            grid-template-columns: 1fr;
+          }
         }
 
         .chart-header {

@@ -13,10 +13,11 @@ import {
   ClipboardList,
   MessageSquare,
   Building2,
-  Bell
+  Bell,
+  X
 } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   const { user } = useAuth();
 
   const menuItems = [
@@ -34,10 +35,13 @@ const Sidebar = () => {
   const filteredItems = menuItems.filter(item => item.roles.includes(user?.role));
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo">
         <ShieldCheck size={32} className="logo-icon" />
         <span className="logo-text">AdManager</span>
+        <button className="mobile-close-btn" onClick={onClose}>
+          <X size={24} />
+        </button>
       </div>
 
       <nav className="sidebar-nav">
@@ -46,6 +50,9 @@ const Sidebar = () => {
             key={item.path} 
             to={item.path} 
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            onClick={() => {
+              if (window.innerWidth <= 1024) onClose();
+            }}
           >
             {item.icon}
             <span>{item.name}</span>
@@ -54,7 +61,9 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <NavLink to="/settings" className="nav-item">
+        <NavLink to="/settings" className="nav-item" onClick={() => {
+          if (window.innerWidth <= 1024) onClose();
+        }}>
           <Settings size={20} />
           <span>Settings</span>
         </NavLink>
@@ -69,6 +78,33 @@ const Sidebar = () => {
           display: flex;
           flex-direction: column;
           padding: 1.5rem 1rem;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 50;
+        }
+
+        .mobile-close-btn {
+          display: none;
+          background: none;
+          color: var(--text-muted);
+          padding: 0.5rem;
+          margin-left: auto;
+        }
+
+        @media (max-width: 1024px) {
+          .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            transform: translateX(-100%);
+          }
+          
+          .sidebar.open {
+            transform: translateX(0);
+          }
+
+          .mobile-close-btn {
+            display: flex;
+          }
         }
 
         .sidebar-logo {

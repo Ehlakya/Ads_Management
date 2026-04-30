@@ -62,6 +62,8 @@ const AdminDashboard = () => {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
+          gap: 1rem;
+          flex-wrap: wrap;
         }
 
         .subtitle {
@@ -102,6 +104,12 @@ const AdminDashboard = () => {
           padding: 3rem;
           background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
           border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+          .welcome-banner {
+            padding: 1.5rem;
+          }
         }
 
         .banner-content {

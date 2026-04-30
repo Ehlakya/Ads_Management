@@ -267,6 +267,7 @@ const AdsList = () => {
           align-items: center;
           margin-bottom: 1.5rem;
           gap: 1rem;
+          flex-wrap: wrap;
         }
 
         .search-wrapper {
@@ -326,7 +327,7 @@ const AdsList = () => {
 
         .ads-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
           gap: 1.5rem;
         }
 
@@ -568,18 +569,36 @@ const AdsList = () => {
 
         .close-modal-btn {
           position: absolute;
-          top: -40px;
-          right: 0;
-          background: none;
+          top: 10px;
+          right: 10px;
+          background: rgba(0, 0, 0, 0.5);
           color: white;
           border: none;
           cursor: pointer;
           opacity: 0.7;
           transition: opacity 0.2s;
+          z-index: 10;
+          padding: 8px;
+          border-radius: 50%;
+          display: flex;
         }
 
         .close-modal-btn:hover {
           opacity: 1;
+          background: rgba(0, 0, 0, 0.8);
+        }
+
+        @media (max-width: 640px) {
+          .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .btn-primary {
+            width: 100%;
+          }
+          .search-wrapper {
+            max-width: 100%;
+          }
         }
 
         .video-player-wrapper {

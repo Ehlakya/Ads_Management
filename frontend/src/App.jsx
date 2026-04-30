@@ -149,17 +149,50 @@ const App = () => {
   );
 };
 
-const Layout = () => (
-  <div className="layout">
-    <Sidebar />
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      <Navbar />
-      <main className="main-content">
-        <Outlet />
-      </main>
+const Layout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  return (
+    <div className="layout">
+      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <div className="main-wrapper">
+        <Navbar onToggleSidebar={toggleSidebar} />
+        <main className="main-content">
+          <Outlet />
+        </main>
+        {isSidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+      </div>
+      <style>{`
+        .main-wrapper {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 40;
+        }
+
+        @media (max-width: 1024px) {
+          .sidebar-overlay {
+            display: block;
+          }
+        }
+      `}</style>
     </div>
-  </div>
-);
+  );
+};
 
 
 // Helper component to route to correct dashboard based on role

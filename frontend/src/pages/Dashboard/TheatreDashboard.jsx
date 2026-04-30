@@ -80,6 +80,13 @@ const TheatreDashboard = () => {
           padding: 2.5rem;
         }
 
+        @media (max-width: 768px) {
+          .overview-card,
+          .info-card {
+            padding: 1.5rem;
+          }
+        }
+
         .overview-card h2 {
           margin-bottom: 0.75rem;
           color: var(--text);
@@ -118,7 +125,7 @@ const TheatreDashboard = () => {
 
         .info-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 1.5rem;
         }
 

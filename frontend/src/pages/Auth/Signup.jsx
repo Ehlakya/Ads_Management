@@ -153,6 +153,12 @@ const Signup = () => {
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
+        @media (max-width: 480px) {
+          .auth-card {
+            padding: 2rem 1.5rem;
+          }
+        }
+
         .auth-header {
           text-align: center;
           margin-bottom: 2.5rem;

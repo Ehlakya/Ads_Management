@@ -99,6 +99,12 @@ const Login = () => {
           animation: slideUp 0.5s ease-out;
         }
 
+        @media (max-width: 480px) {
+          .auth-card {
+            padding: 2rem 1.5rem;
+          }
+        }
+
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
