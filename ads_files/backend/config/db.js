@@ -6,67 +6,44 @@ dotenv.config();
 
 const { Sequelize } = require('sequelize');
 
+// Hardcoded fallback as explicitly requested by the user
+const DB_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_5MIZbVdKYW9G@ep-delicate-shape-aoii5n44-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+
 let pool;
 let sequelize;
 
 // Utility to safely log DB info without leaking passwords
 const logDbInfo = () => {
-  if (process.env.DATABASE_URL) {
-    try {
-      const url = new URL(process.env.DATABASE_URL);
-      console.log(`ℹ️  Using DATABASE_URL configuration (Production mode).`);
-      console.log(`ℹ️  Connecting to Database Host: ${url.hostname} on Port: ${url.port || 5432}`);
-    } catch (e) {
-      console.log(`ℹ️  Using DATABASE_URL configuration (Invalid URL format).`);
-    }
-  } else {
-    console.log(`ℹ️  Using individual DB_* environment variables (Local mode).`);
-    console.log(`ℹ️  Connecting to Database Host: ${process.env.DB_HOST} on Port: ${process.env.DB_PORT}`);
+  try {
+    const url = new URL(DB_URL);
+    console.log(`ℹ️  Using DATABASE_URL configuration.`);
+    console.log(`ℹ️  Connecting to Database Host: ${url.hostname} on Port: ${url.port || 5432}`);
+  } catch (e) {
+    console.log(`ℹ️  Using DATABASE_URL configuration (Invalid URL format).`);
   }
 };
 
 logDbInfo();
 
-if (process.env.DATABASE_URL) {
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+// Use the Neon database directly with SSL enabled
+pool = new Pool({
+  connectionString: DB_URL,
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,
+  }
+});
+
+sequelize = new Sequelize(DB_URL, {
+  dialect: 'postgres',
+  logging: false, 
+  dialectOptions: {
     ssl: {
       require: true,
       rejectUnauthorized: false,
     }
-  });
-
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    logging: false, 
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      }
-    }
-  });
-} else {
-  pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-  });
-
-  sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
-    {
-      host: process.env.DB_HOST,
-      dialect: 'postgres',
-      port: process.env.DB_PORT,
-      logging: false,
-    }
-  );
-}
+  }
+});
 
 pool.on('connect', () => {
   console.log('✅ PostgreSQL Database connected successfully (pg Pool)');
