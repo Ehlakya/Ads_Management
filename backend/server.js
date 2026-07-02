@@ -17,7 +17,14 @@ const app = express();
 app.use(express.json());
 
 // Enable CORS
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://ads-management-5msd.vercel.app', 
+    'http://localhost:5173', 
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
