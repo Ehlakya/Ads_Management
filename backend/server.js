@@ -18,11 +18,20 @@ app.use(express.json());
 
 // Enable CORS
 app.use(cors({
-  origin: [
-    'https://ads-management-5msd.vercel.app', 
-    'http://localhost:5173', 
-    'http://localhost:3000'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (
+      origin.includes('vercel.app') || 
+      origin.includes('localhost') || 
+      origin === 'https://ads-management-5msd.vercel.app'
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
