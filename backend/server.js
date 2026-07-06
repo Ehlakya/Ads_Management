@@ -5,11 +5,11 @@ const morgan = require('morgan');
 const path = require('path');
 const { errorHandler } = require('./middleware/errorMiddleware');
 
-// Initialize models and associations
-require('./models');
-
 // Load env vars
 dotenv.config();
+
+// Initialize models and associations
+require('./models');
 
 const app = express();
 
