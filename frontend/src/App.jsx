@@ -195,25 +195,16 @@ const Layout = () => {
 };
 
 
+// Helper component to route to correct dashboard based on role
 const DashboardRouter = () => {
   const { user } = useAuth();
   
-  if (!user) return <Navigate to="/login" replace />;
-
-  const role = user.role?.trim();
+  if (user?.role === 'superadmin') return <SuperAdminDashboard />;
+  if (user?.role === 'admin') return <AdminDashboard />;
+  if (user?.role === 'agent') return <AgentDashboard />;
+  if (user?.role === 'theatre_user') return <TheatreDashboard />;
   
-  if (role === 'superadmin') return <SuperAdminDashboard />;
-  if (role === 'admin') return <AdminDashboard />;
-  if (role === 'agent') return <AgentDashboard />;
-  if (role === 'theatre_user') return <TheatreDashboard />;
-  
-  console.error('Unknown role encountered:', user.role);
-  return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h2>Access Denied</h2>
-      <p>Your user role ("{user.role}") is not recognized. Please contact an administrator.</p>
-    </div>
-  );
+  return <Navigate to="/login" replace />;
 };
 
 export default App;

@@ -8,19 +8,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser && storedUser !== 'undefined') {
-        setUser(JSON.parse(storedUser));
-      } else {
-        localStorage.removeItem('user'); // cleanup bad state
-      }
-    } catch (error) {
-      console.error('Failed to parse user from local storage:', error);
-      localStorage.removeItem('user'); // remove corrupted data
-    } finally {
-      setLoading(false);
+    // Check if user is logged in (e.g., check localStorage)
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   const login = (userData) => {

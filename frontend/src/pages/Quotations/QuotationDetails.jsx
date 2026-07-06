@@ -11,8 +11,7 @@ import {
   Shield,
   PlayCircle,
   XCircle,
-  Monitor,
-  X
+  Monitor
 } from 'lucide-react';
 import quotationService from '../../services/quotationService';
 import { useAuth } from '../../context/AuthContext';
@@ -75,11 +74,7 @@ const QuotationDetails = () => {
       toast.error('Details not loaded');
       return;
     }
-    if (user?.role === 'agent') {
-      navigate(`/sales/add/${quotation.ad_id}`);
-    } else {
-      navigate(`/quotations/${id}/request`);
-    }
+    navigate(`/quotations/${id}/request`);
   };
 
   if (isLoading) {
@@ -215,7 +210,7 @@ const QuotationDetails = () => {
           )}
         </div>
 
-        {(user?.role === 'theatre_user' || user?.role === 'agent') && quotation.status !== 'confirmed' && (
+        {user?.role === 'theatre_user' && quotation.status !== 'confirmed' && (
           <div className="card-actions">
             <button 
               onClick={handleOkClick} 
